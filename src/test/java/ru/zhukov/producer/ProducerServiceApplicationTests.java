@@ -1,4 +1,4 @@
-package ProducerService;
+package ru.zhukov.producer;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

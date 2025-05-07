@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: ProducerService
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    username: ${USERNAME}
+    password: ${PASSWORD}
+    url: jdbc:postgresql://localhost:5432/${DB_NAME}
+#  kafka:
+#    bootstrap-servers: localhost:29092
+#    consumer:
+#      auto-offset-reset: earliest
+#      group-id: ivan-group
+#      enable-auto-commit: true
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+server:
+  port: 666
+
+client:
+  topics:
+    order: order.v1
