@@ -9,15 +9,8 @@ spring:
     username: ${USERNAME}
     password: ${PASSWORD}
     url: jdbc:postgresql://localhost:5432/${DB_NAME}
-#  kafka:
-#    bootstrap-servers: localhost:29092
-#    consumer:
-#      auto-offset-reset: earliest
-#      group-id: ivan-group
-#      enable-auto-commit: true
-#    producer:
-#      key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
-#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  kafka:
+    bootstrap-servers: localhost:29092
 
 server:
   port: 666

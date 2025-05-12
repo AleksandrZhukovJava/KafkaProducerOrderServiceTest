@@ -12,9 +12,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import ru.zhukov.producer.domain.kafka.EventSource;
+import ru.zhukov.producer.domain.kafka.EventType;
 
 import java.time.Instant;
 import java.util.UUID;
+
+import static ru.zhukov.producer.domain.kafka.EventType.ORDER;
 
 @Entity
 @EqualsAndHashCode
@@ -24,7 +28,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "orders")
-public class Order {
+public class Order implements EventSource {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -32,4 +36,14 @@ public class Order {
     @CreationTimestamp
     private Instant dateCreated;
     private int itemAmount;
+
+    @Override
+    public UUID getAggregateId() {
+        return id;
+    }
+
+    @Override
+    public EventType getEventType() {
+        return ORDER;
+    }
 }

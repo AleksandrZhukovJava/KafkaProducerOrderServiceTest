@@ -3,7 +3,7 @@ version: '3'
 services:
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.4
+    image: confluentinc/cp-zookeeper:latest
     healthcheck:
       test: [ "CMD", "nc", "-vz", "localhost", "2181" ]
       interval: 10s
@@ -12,11 +12,14 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVER_ID: 1
     ports:
       - 22181:2181
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper
 
   kafka:
-    image: confluentinc/cp-kafka:6.2.4
+    image: confluentinc/cp-kafka:latest
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -35,12 +38,15 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CLUSTER_ID: test-kafka-cluster-id
+    volumes:
+      - kafka-data:/var/lib/kafka/data
 
   kafka-ui:
     image: provectuslabs/kafka-ui
     container_name: kafka-ui
     ports:
-      - "8080:8080"
+      - "22180:8080"
     restart: always
     depends_on:
       kafka:
@@ -49,20 +55,67 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
 
-  kafka-topics-generator:
-    image: confluentinc/cp-kafka:6.2.4
+  #  kafka-topics-generator:
+  #    image: confluentinc/cp-kafka:latest
+  #    depends_on:
+  #      kafka:
+  #        condition: service_healthy
+  #    entrypoint: [ '/bin/sh', '-c' ]
+  #    command: |
+  #      "
+  #      # blocks until kafka is reachable
+  #      kafka-topics --bootstrap-server kafka:9092 --list
+  #
+  #      echo -e 'Creating kafka topics'
+  #      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order.v1 --replication-factor 1 --partitions 2
+  #
+  #      echo -e 'Successfully created the following topics:'
+  #      kafka-topics --bootstrap-server kafka:9092 --list
+  #      "
+
+  drone-server:
+    image: drone/drone:latest
+    container_name: drone-server
+    environment:
+      - DRONE_GITHUB_CLIENT_ID=Ov23ctw4jfDFxRUHtg4S
+      - DRONE_GITHUB_CLIENT_SECRET=fe8078d9e57cf876f0795a1a8880669464a5af1b
+      - DRONE_RPC_SECRET=f0cb78c0-43ef-4480-ae9c-267518a8552e
+      - DRONE_LOGS_DEBUG=true
+      - DRONE_CRON_DISABLED=true
+      - DRONE_SERVER_HOST=localhost:8000
+      - DRONE_SERVER_PROTO=http
+    ports:
+      - "8000:80"
+      - "9000:9000"
+    volumes:
+      - drone-data:/data
+    restart: always
+
+
+  drone-agent:
+    image: drone/drone-runner-docker:latest
+    environment:
+      - DRONE_RPC_HOST=drone-server
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_SECRET=f0cb78c0-43ef-4480-ae9c-267518a8552e
     depends_on:
-      kafka:
-        condition: service_healthy
-    entrypoint: [ '/bin/sh', '-c' ]
-    command: |
-      "
-      # blocks until kafka is reachable
-      kafka-topics --bootstrap-server kafka:9092 --list
-      
-      echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic order.v1 --replication-factor 1 --partitions 2
-      
-      echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka:9092 --list
-      "
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  nexus:
+    image: sonatype/nexus3
+    container_name: nexus
+    ports:
+      - "8081:8081"
+      - "5000:5000"
+    volumes:
+      - nexus-data:/nexus-data
+    restart: unless-stopped
+
+volumes:
+  drone-data:
+  kafka-data:
+  zookeeper-data:
+  nexus-data:
+    driver: local
