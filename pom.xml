@@ -9,22 +9,22 @@
         <relativePath/>
     </parent>
     <groupId>ru.zhukov</groupId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
-    <artifactId>producer-service</artifactId>
-    <name>ProducerService</name>
-    <description>ProducerService</description>
+    <artifactId>client-service</artifactId>
+    <name>ClientService</name>
+    <description>Service for save and manage clients</description>
 
     <distributionManagement>
         <repository>
-            <id>kafka-library</id>
-            <url>http://localhost:8081/repository/kafka-library/</url>
+            <id>test-services</id>
+            <url>http://localhost:8081/repository/test-services/</url>
         </repository>
     </distributionManagement>
 
     <properties>
         <java.version>17</java.version>
-        <kafka_library_version>1.0.2</kafka_library_version>
+        <kafka_library_version>1.0.6</kafka_library_version>
     </properties>
 
     <dependencies>
@@ -82,15 +82,17 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <pushChanges>true</pushChanges>
+                    <scmCommentPrefix>[release]</scmCommentPrefix>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
         </plugins>
