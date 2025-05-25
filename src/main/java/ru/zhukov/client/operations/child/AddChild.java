@@ -28,6 +28,10 @@ public class AddChild {
                 .parents(parents)
                 .build();
 
-        return childRepository.save(child).getId();
+        childRepository.save(child);
+
+        // event
+
+        return child.getId();
     }
 }

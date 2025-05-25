@@ -67,9 +67,26 @@ services:
       - nexus-data:/nexus-data
     restart: unless-stopped
 
+  org-runner:
+    image: myoung34/github-runner:latest
+    container_name: github-org-runner
+    restart: always
+    environment:
+      ORG_NAME: SpeechPathologistOrganization
+      RUNNER_NAME: org-docker-runner
+      RUNNER_WORKDIR: /tmp/github-runner
+      REPO_URL: https://github.com/SpeechPathologistOrganization
+      LABELS: self-hosted,docker
+      RUNNER_TOKEN: ${GITHUB_RUNNER_TOKEN}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - runner-org-data:/tmp/github-runner
+    command: ./run.sh
+
 volumes:
   drone-data:
   kafka-data:
   zookeeper-data:
+  runner-org-data:
   nexus-data:
     driver: local
