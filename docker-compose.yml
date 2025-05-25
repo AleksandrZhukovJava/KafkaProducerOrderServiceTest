@@ -80,13 +80,13 @@ services:
       RUNNER_TOKEN: ${GITHUB_RUNNER_TOKEN}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - runner-org-data:/tmp/github-runner
+      - runner-organization-data:/tmp/github-runner
     command: ./run.sh
 
 volumes:
   drone-data:
   kafka-data:
   zookeeper-data:
-  runner-org-data:
+  runner-organization-data:
   nexus-data:
     driver: local
